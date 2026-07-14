@@ -61,6 +61,12 @@ async def vouch(
     }
     vouches[user.id].append(vouch_data)
     
+    # Get server banner
+    guild = interaction.guild
+    banner_url = None
+    if guild and guild.banner:
+        banner_url = guild.banner.url
+    
     # Create embed for the vouch
     embed = discord.Embed(
         title="✅ New Vouch!",
@@ -70,7 +76,13 @@ async def vouch(
     embed.add_field(name="📦 Item/Service", value=item, inline=False)
     embed.add_field(name="📝 Experience", value=experience, inline=False)
     embed.add_field(name="⭐ Total Vouches", value=str(len(vouches[user.id])), inline=True)
-    embed.set_footer(text=f"Requested by {interaction.user}")
+    
+    # Add server banner as image if available
+    if banner_url:
+        embed.set_image(url=banner_url)
+    
+    embed.set_thumbnail(url=user.avatar.url if user.avatar else None)
+    embed.set_footer(text=f"Server: {guild.name} | Requested by {interaction.user}")
     embed.timestamp = interaction.created_at
     
     await interaction.response.send_message(embed=embed)
